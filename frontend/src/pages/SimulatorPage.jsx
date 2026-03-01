@@ -21,7 +21,7 @@ function SimulatorPage() {
 
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <SimulationControls onRun={handleRun} onReset={handleReset} running={loading} />
-        <CircuitCanvas elements={elements} onSelect={setSelected} />
+        <CircuitCanvas elements={elements} onSelect={setSelected} onUpdateElement={updateElement} />
         {error && <p style={{ color: 'red', padding: '8px' }}>{error}</p>}
         {loading && <Spinner />}
         <ResultsTable results={results} />
