@@ -30,3 +30,24 @@ class SimulationResultRead(SimulationResponse):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+# ---------------------------------------------------------------------------
+# Series-circuit schemas
+# ---------------------------------------------------------------------------
+
+class SeriesCircuitRequest(BaseModel):
+    resistances: list[float] = Field(..., description="List of resistance values in ohms (series order)")
+    voltage: float = Field(..., description="Source voltage in volts")
+
+
+class SeriesResistorResult(BaseModel):
+    index: int = Field(..., description="Zero-based position in the series chain")
+    resistance: float = Field(..., description="Resistance value in ohms")
+    voltage_drop: float = Field(..., description="Voltage drop across this resistor in volts")
+
+
+class SeriesCircuitResponse(BaseModel):
+    total_resistance: float = Field(..., description="Total series resistance in ohms")
+    total_current: float = Field(..., description="Total current in amperes")
+    voltage_drops: list[SeriesResistorResult] = Field(..., description="Voltage drop across each resistor")
