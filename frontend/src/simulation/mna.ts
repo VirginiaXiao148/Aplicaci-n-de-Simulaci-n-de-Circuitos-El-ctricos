@@ -270,8 +270,8 @@ export function simulateDC(circuit: Circuit): SimulationResult {
         branchCurrents[comp.id] = comp.value;
         powerDissipation[comp.id] = -vDiff * comp.value;
       } else if (comp.type === 'inductor') {
-        const current = comp.value > 0 ? vDiff / comp.value : 0;
-        branchCurrents[comp.id] = current;
+        // DC steady-state: inductor is a short circuit (stamped as 1e-6 Ω)
+        branchCurrents[comp.id] = vDiff / 1e-6;
         powerDissipation[comp.id] = 0;
       }
     });
