@@ -26,6 +26,83 @@ from app.schemas.simulation import SimulationResultItem
 _PENALTY = 1e9
 
 
+def solve_simple_circuit(voltaje_total: float, resistencias: list[dict[str, Any]]) -> dict[str, Any]:
+    """
+    Resuelve un circuito simple en serie calculando resistencia total, corriente y potencia.
+    
+    Esta función entiende circuitos en serie donde el voltaje total se divide entre
+    las resistencias según su proporción. Utiliza la Ley de Ohm y la Ley de Joule.
+    
+    Args:
+        voltaje_total: Voltaje total del circuito en voltios (V).
+        resistencias: Lista de diccionarios con propiedades de resistencias.
+                     Cada diccionario debe contener:
+                     - 'id': identificador de la resistencia (str)
+                     - 'resistance': valor de la resistencia en Ohmios (float)
+    
+    Returns:
+        Diccionario con las claves:
+        - 'resistencia_total': Resistencia total del circuito en Ohmios (Ω)
+        - 'corriente_total': Corriente del circuito en Amperios (A)
+        - 'potencias': Lista de diccionarios con:
+            - 'id': identificador de la resistencia
+            - 'voltaje': voltaje a través de la resistencia (V)
+            - 'corriente': corriente a través de la resistencia (A)
+            - 'potencia': potencia disipada en la resistencia (W)
+    
+    Raises:
+        ValueError: Si no hay resistencias, la resistencia total es cero o el voltaje es negativo.
+    
+    Ejemplo:
+        >>> resistencias = [
+        ...     {'id': 'R1', 'resistance': 100},
+        ...     {'id': 'R2', 'resistance': 200}
+        ... ]
+        >>> resultado = solve_simple_circuit(150, resistencias)
+        >>> resultado['resistencia_total']
+        300
+        >>> resultado['corriente_total']
+        0.5
+    """
+    # Validaciones de entrada
+    if not resistencias:
+        raise ValueError("Debe proporcionarse al menos una resistencia.")
+    
+    if voltaje_total < 0:
+        raise ValueError("El voltaje total no puede ser negativo.")
+    
+    # Calcular resistencia total (suma de todas las resistencias en serie)
+    resistencia_total = sum(r.get('resistance', 0) for r in resistencias)
+    
+    if resistencia_total == 0:
+        raise ValueError("La resistencia total no puede ser cero.")
+    
+    # Calcular corriente del circuito usando la Ley de Ohm: I = V / R
+    corriente_total = voltaje_total / resistencia_total
+    
+    # Calcular potencia disipada en cada componente
+    potencias = []
+    for resistencia in resistencias:
+        r_valor = float(resistencia.get('resistance', 0))
+        # Voltaje a través de cada resistencia: V = I * R
+        voltaje_componente = corriente_total * r_valor
+        # Potencia disipada: P = I² * R = V * I = V² / R
+        potencia_componente = (corriente_total ** 2) * r_valor
+        
+        potencias.append({
+            'id': resistencia.get('id', f'R{len(potencias) + 1}'),
+            'voltaje': round(voltaje_componente, 6),
+            'corriente': round(corriente_total, 9),
+            'potencia': round(potencia_componente, 6)
+        })
+    
+    return {
+        'resistencia_total': round(resistencia_total, 6),
+        'corriente_total': round(corriente_total, 9),
+        'potencias': potencias
+    }
+
+
 class DCNodalSolver:
     """
     Simplified DC nodal solver.
