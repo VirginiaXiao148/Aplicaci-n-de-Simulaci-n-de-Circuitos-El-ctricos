@@ -5,10 +5,14 @@ from app.schemas.simulation import (
     SimulationResponse,
     SimulationResultItem,
     SimulationResultRead,
+    SeriesCircuitRequest,
+    SeriesResistorResult,
+    SeriesCircuitResponse,
 )
 
 __all__ = [
     "CircuitBase", "CircuitCreate", "CircuitUpdate", "CircuitRead",
     "Component", "ComponentTipo",
     "SimulationRequest", "SimulationResponse", "SimulationResultItem", "SimulationResultRead",
+    "SeriesCircuitRequest", "SeriesResistorResult", "SeriesCircuitResponse",
 ]
